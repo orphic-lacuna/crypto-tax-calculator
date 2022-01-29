@@ -11,18 +11,28 @@ export class Tranche {
 		UnknownSource: Symbol("unknown source")
 	});
 	
-	constructor(depot, creationTimestamp, asset, amount, flags){ 
+	static Source = Object.freeze({
+		Unknown: Symbol("unknown"),
+		Interest: Symbol("interest"),
+		Buy: Symbol("buy")
+	});
+	
+	static _idCounter = 0;
+	
+	constructor(depot, creationTimestamp, asset, amount, source, flags){ 
 		// depot to which this tranche of coins belongs
 		this.depot = depot;
-		// add this tranche to the depot's list of tranches
-		// depot.tranches.add(this);
-		// depot-unique id for the tranche
-		//this.id = depot.tranches.size;
+		
+		// unique id for the tranche
+		this.id = Tranche._idCounter;
+		Tranche._idCounter += 1;
+		
 		this.creationTimestamp = creationTimestamp;
 		this.asset = asset;
 		this.amount = amount;
 		// start with zero amount of consumed coins
 		this.consumed = 0;
+		this.source = source;
 		// flags
 		if (flags instanceof Set) {
 			this.flags = flags;	

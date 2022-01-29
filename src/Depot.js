@@ -37,9 +37,14 @@ export class Depot {
 		}
 		return name;
 	}
-	
-	addTranche(tranche) {
-		this.tranches.add(tranche);
+
+	/**
+	 * Creates a new tranche and adds it to this depot.
+	 */
+	addTranche() {
+		const t = new Tranche(this, ...arguments);
+		this.tranches.add(t);
+		return t;
 	}
 	
 	/**
@@ -48,7 +53,7 @@ export class Depot {
 	 * @param fifo		If true, the oldest tranche is returned. If false, the newest tranche is returned.
 	 */
 	_getNextTranche(asset, timestamp, fifo=true) {
-		if (typeof timestamp != "number") throw "missing timestamp";
+		if (typeof timestamp != "number") throw new Error("missing timestamp");
 		
 		// filter out all tranches
 		// 		a) that do not have the desired asset
@@ -74,8 +79,13 @@ export class Depot {
 	 * @param[in]	asset		The asset of the coins to be consumed
 	 * @param[in]	amount		The amount of coins to be consumed
 	 * @param[in]	timestamp	Timestamp of the consumption, used for generating report entries
+	 * @returns					Returns a list of objects containing the amount of coins consumed and the tranche used for consuming
+	 *							e.g. [{amount: 1, tranche: <Tranche Object>}, ...]
 	 */
-	consume(asset, amount, timestamp) {
+	consume(timestamp, asset, amount) {
+		// list of tranches that have been used for consuming coins of this depot
+		const consumedTranchesInfo = [];
+		
 		let amountLeftToBeConsumed = amount;
 		// loop until all requested coins are provided by tranches of this depot
 		while (amountLeftToBeConsumed > 0) {
@@ -92,24 +102,30 @@ export class Depot {
 					amount: amountLeft
 				});*/
 				// now create a fake tranche with creation timestamp equal to consumption timestamp to be tax correct (in doubt for the govt.)
-				trancheToBeConsumedNext = new Tranche(this.depot, timestamp, asset, amountLeftToBeConsumed, [Tranche.Flags.UnknownSource]);
+				trancheToBeConsumedNext = new Tranche(this.depot, timestamp, asset, amountLeftToBeConsumed, Tranche.Source.Unknown);
 			}
 			// determine how much of the requested amount can be covered by this tranche
 			const amountConsumedByCurrentTranche = trancheToBeConsumedNext.consume(amountLeftToBeConsumed, timestamp);
+			// add the amount and the tranche to the resulting list of tranches that have been used for consuming coins of this depot
+			consumedTranchesInfo.push({
+				tranche: trancheToBeConsumedNext,
+				amount: amountConsumedByCurrentTranche
+			});
+			
 			// TODO: call the callback with the tranche and amount that is taken from that tranche, callback calculates tax stuff
 			// await callback(tranche, amountConsumed, trancheConsumptionReportEntry);
 			// update the uncovered amount left
 			amountLeftToBeConsumed -= amountConsumedByCurrentTranche;
 		}
 		// return the total amount that has been consumed
-		return amount - amountLeftToBeConsumed;
+		return consumedTranchesInfo;
 	}
 
 	/**
 	 * Returns the balance of the depot for a given asset and timestamp.
 	 */	
-	getBalance(asset, timestamp) {
-		if (typeof timestamp == "undefined") timestamp = new Date().getTime() / 1000;
+	getBalance(timestamp, asset) {
+		if (typeof timestamp != "number") throw new Error("missing timestamp");
 		return [...this.tranches.values()].filter(t => (t.asset == asset) && (t.creationTimestamp <= timestamp)).reduce((balance, t) => balance + t.amountLeft, 0);
 	}
 }

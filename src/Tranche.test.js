@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Tranche } from "../src/Tranche.js";
+import { Tranche } from "./Tranche.js";
 
 describe('Tranche', function() {
 	let tranche;

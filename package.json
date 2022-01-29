@@ -4,7 +4,7 @@
 	"description": "A Node.js package for calculating crypto taxes in Germany.",
 	"main": "main.js",
 	"scripts": {
-		"test": "mocha",
+		"test": "mocha 'src/**/*.test.js'",
 		"start": "node main.js"
 	},
 	"keywords": [
