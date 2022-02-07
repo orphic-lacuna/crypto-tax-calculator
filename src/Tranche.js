@@ -8,18 +8,19 @@ export class Tranche {
 	
 	static Flags = Object.freeze({
 		Staked: Symbol("staked"),
-		UnknownSource: Symbol("unknown source")
 	});
 	
+	/*
 	static Source = Object.freeze({
 		Unknown: Symbol("unknown"),
 		Interest: Symbol("interest"),
 		Buy: Symbol("buy")
 	});
+	*/
 	
 	static _idCounter = 0;
 	
-	constructor(depot, creationTimestamp, asset, amount, source, flags){ 
+	constructor(depot, creationTimestamp, asset, amount, sourceTransaction){ 
 		// depot to which this tranche of coins belongs
 		this.depot = depot;
 		
@@ -32,16 +33,9 @@ export class Tranche {
 		this.amount = amount;
 		// start with zero amount of consumed coins
 		this.consumed = 0;
-		this.source = source;
+		this.sourceTransaction = sourceTransaction;
 		// flags
-		if (flags instanceof Set) {
-			this.flags = flags;	
-		} else if (flags instanceof Array) {
-			this.flags = new Set(flags);
-		} else {
-			this.flags = new Set();
-		}
-		
+		this.flags = new Set();
 
 		// TODO: rework this report
 		// generate a tranche consumption report entry
@@ -63,7 +57,7 @@ export class Tranche {
 	 * Consumes a certain amount of this tranche.
 	 * @return Returns the amount of coins that could be consumed from this tranche and a report entry.
 	 */
-	consume(amount, consumptionTimestamp, transactionInfo) {
+	consume(amount) {
 		// return value: the amount of coins actually consumed by this function call
 		let consumedAmount = 0;
 		// check if requested amount can be completely delivered by this tranche

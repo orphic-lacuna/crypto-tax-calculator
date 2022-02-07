@@ -1,0 +1,6 @@
+{
+	"DepositWithdrawalLinking": {
+		"MaxAmountDeviationRatio": 0.05,
+		"MaxTimeDeviationSec": 10800
+	}
+}

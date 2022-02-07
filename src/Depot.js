@@ -102,14 +102,15 @@ export class Depot {
 					amount: amountLeft
 				});*/
 				// now create a fake tranche with creation timestamp equal to consumption timestamp to be tax correct (in doubt for the govt.)
-				trancheToBeConsumedNext = new Tranche(this.depot, timestamp, asset, amountLeftToBeConsumed, Tranche.Source.Unknown);
+				trancheToBeConsumedNext = new Tranche(this.depot, timestamp, asset, amountLeftToBeConsumed);
 			}
 			// determine how much of the requested amount can be covered by this tranche
-			const amountConsumedByCurrentTranche = trancheToBeConsumedNext.consume(amountLeftToBeConsumed, timestamp);
+			const amountConsumedByCurrentTranche = trancheToBeConsumedNext.consume(amountLeftToBeConsumed);
 			// add the amount and the tranche to the resulting list of tranches that have been used for consuming coins of this depot
 			consumedTranchesInfo.push({
 				tranche: trancheToBeConsumedNext,
-				amount: amountConsumedByCurrentTranche
+				amount: amountConsumedByCurrentTranche,
+				timestamp: timestamp
 			});
 			
 			// TODO: call the callback with the tranche and amount that is taken from that tranche, callback calculates tax stuff

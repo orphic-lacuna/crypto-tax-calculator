@@ -2,10 +2,10 @@
 	"name": "crypto-tax-calculator",
 	"version": "0.1.0",
 	"description": "A Node.js package for calculating crypto taxes in Germany.",
-	"main": "main.js",
+	"main": "src/main.js",
 	"scripts": {
 		"test": "mocha 'src/**/*.test.js'",
-		"start": "node main.js"
+		"start": "node src/main.js"
 	},
 	"keywords": [
 		"Crypto",

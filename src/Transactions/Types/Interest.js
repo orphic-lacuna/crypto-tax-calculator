@@ -1,4 +1,4 @@
-import { Transaction, Tranche } from "./Transaction.js";
+import { Transaction } from "./Transaction.js";
 
 export class Interest extends Transaction {
 	
@@ -17,22 +17,13 @@ export class Interest extends Transaction {
 		this.type = type;
 	}
 	
-	/**
-	 * Processes the transaction.
-	 */
-	process() {
+	_process(reports) {
 		// an Interest transaction only produces coins, it doesn't consume any coins
 		// tax relevant are only the following types of interest:
 		if ([Interest.Type.Staking, Interest.Type.Lending, Interest.Type.Mining, Interest.Type.Referral].includes(this.type)) {
-			/*TODO: report
-				globalThis.Reports.Interest.add({
-				timestamp: this.timestamp,
-				asset: this.asset,
-				amount: this.amount,
-				type: this.type
-			});*/
+			reports.Interest.add(this.timestamp, this.asset, this.amount, this.type);
 		}
-		this.depot.addTranche(this.timestamp, this.asset, this.amount, Tranche.Source.Interest);
+		this.depot.addTranche(this.timestamp, this.asset, this.amount, this);
 	}
 	
 	toString() {
