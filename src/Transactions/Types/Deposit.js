@@ -17,9 +17,19 @@ export class Deposit extends Transaction {
 			// That means the deposit transaction needs to know about all tranches consumed by the withdrawal. 
 			// That's why we must make sure that the withdrawal transaction is processed first.
 			const consumedTranches = this.withdrawalTransaction.process(...arguments);
-			for (let {timestamp, amount, tranche} of consumedTranches) {
-				this.depot.addTranche(timestamp, this.asset, amount, tranche.sourceTransaction);
-			}
+			this._mirrorWithdrawalTranches(consumedTranches);
+		} else {
+			// if we don't have a linked withdrawal, we must assume that the coins are new -> Deposit behaves like a buy transaction
+			this.depot.addTranche(this.timestamp, this.asset, this.amount, this);
+		}
+	}
+
+	_mirrorWithdrawalTranches(consumedTranches) {
+		let remainingAmount = this.amount;
+		for (let {amount, tranche} of consumedTranches) {
+			let amountFromThisTranche = Math.min(remainingAmount, amount);
+			remainingAmount -= amountFromThisTranche;
+			this.depot.addTranche(tranche.creationTimestamp, this.asset, amountFromThisTranche, tranche.sourceTransaction);
 		}
 	}
 

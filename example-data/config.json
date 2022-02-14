@@ -2,5 +2,9 @@
 	"DepositWithdrawalLinking": {
 		"MaxAmountDeviationRatio": 0.05,
 		"MaxTimeDeviationSec": 10800
+	},
+	"TimeUntilTaxFree": {
+		"IfOnlyHeld": 31536000,
+		"IfStaked": 315360000
 	}
 }

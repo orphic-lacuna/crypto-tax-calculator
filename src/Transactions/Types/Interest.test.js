@@ -25,7 +25,7 @@ describe('Transactions', function() {
 			expect(tranches[0].asset).to.equal("BTC");
 			expect(tranches[0].amount).to.equal(5);
 			expect(tranches[0].creationTimestamp).to.equal(now);
-			expect(tranches[0].source).to.equal(interestTransaction);
+			expect(tranches[0].sourceTransaction).to.equal(interestTransaction);
 		});
 
 		it('should create a new interest report entry', function() {

@@ -14,6 +14,7 @@ export class TransactionProcessor {
 	addTransaction(transaction) {
 		if (this.transactions.includes(transaction)) throw new Error("transaction already known by transaction processor");
 		this.transactions.push(transaction);
+		return transaction;
 	}
 	
 	_sortTransactions() {
@@ -36,7 +37,7 @@ export class TransactionProcessor {
 			
 			// find a matching withdrawal
 			const matchingWithdrawal = withdrawals.find(withdrawal => {
-				// disting depot?
+				// distinct depot?
 				if (withdrawal.depot != deposit.depot) {
 					// same asset?
 					if (withdrawal.asset == deposit.asset) {

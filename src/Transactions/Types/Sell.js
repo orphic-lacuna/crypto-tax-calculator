@@ -4,7 +4,7 @@ import { Tranche } from "../../Tranche.js";
 export class Sell extends Transaction {
 	
 	_process() {
-		// spending only consumes coins of a depot
+		// selling only consumes coins of a depot
 		for (let {amount, tranche} of this.depot.consume(this.timestamp, this.asset, this.amount)) {
 			// the asset of the tranche must match the asset of the transaction
 			if (tranche.asset != this.asset) throw new Error("Error processing sell transaction: tranch asset differs from transaction asset");

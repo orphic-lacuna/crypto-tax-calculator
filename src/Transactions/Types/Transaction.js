@@ -19,6 +19,10 @@ export class Transaction {
 		Transaction._idCounter += 1;
 	}
 	
+	/**
+	 * Processes an transaction. Actually a wrapper function ensuring that the internal _process function of the subclasses is called only once
+	 * for each transaction. The wrapper function can be called multiple times. It does processing only one but always returns the same result of processing.
+	 */
 	process() {
 		if (!this.isProcessed()) {
 			this._processingResult = this._process(...arguments);
