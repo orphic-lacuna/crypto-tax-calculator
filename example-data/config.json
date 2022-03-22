@@ -3,9 +3,14 @@
 		"MaxAmountDeviationRatio": 0.05,
 		"MaxTimeDeviationSec": 10800
 	},
-	"TimeUntilTaxFree": {
-		"IfOnlyHeld": { "years": 1 },
-		"IfStaked": { "years": 10 }
+	"TaxRules": {
+		"Trading": {
+			"NoTaxIfHeldAfter": { "years": 1 },
+			"NoxTaxIfStakedAfter": { "years": 10 }
+		},
+		"Interest": {
+			"TaxedTypes": ["Mining", "Staking", "Lending", "Referral"]
+		}
 	},
-	"BaseCurrency": "EURO"
+	"BaseCurrency": "EUR"
 }

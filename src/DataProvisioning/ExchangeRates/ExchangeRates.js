@@ -159,7 +159,7 @@ export class ExchangeRates {
 				let history;
 				try {
 					let coinID = await this.coinList.getID(asset);
-					console.log("Fetching exchange rate for", asset, "at", key, ", coin ID:", coinID);
+					// console.log("Fetching exchange rate for", asset, "at", key, ", coin ID:", coinID);
 					history = await cgc.coins.fetchHistory(coinID, {
 						"date": timestamp.toFormat("dd-MM-yyyy"),
 						"localization": false
@@ -167,10 +167,10 @@ export class ExchangeRates {
 	
 					let rate = 0;
 					if ((history["success"]) && (!history["data"]["market_data"])) {
-						console.log("\tNo exchange rate available, assuming 0");
+						// console.log("\tNo exchange rate available, assuming 0");
 					} else {
-						rate = history["data"]["market_data"]["current_price"][globalThis.config["baseCurrency"].toLowerCase()];
-						console.log("\t", rate);
+						rate = history["data"]["market_data"]["current_price"][globalThis.Config["BaseCurrency"].toLowerCase()];
+						// console.log("\t", rate);
 					}
 	
 					this.exchangeRates[asset][key] = rate;
@@ -178,9 +178,9 @@ export class ExchangeRates {
 					await sleep(1000);
 					return rate;
 				} catch(error) {
-					console.log("Response:", history);
+					console.error("Response:", history);
 					console.error(error);
-					console.log("Retrying request in 30 seconds ...");
+					console.error("Retrying request in 30 seconds ...");
 					await sleep(30000);
 				}
 			}

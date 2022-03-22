@@ -1,6 +1,11 @@
 import { ReportEntry } from "../ReportEntry.js";
+import { DateTime } from "luxon";
 
 export class Fee extends ReportEntry {
+	static get filename() {
+		return "Fees.csv";
+	}
+	
 	static getHeadline() {
 		return "Time;Amount;Asset;Value in " + Config.BaseCurrency + ";";
 	}
@@ -13,13 +18,15 @@ export class Fee extends ReportEntry {
 	constructor(timestamp, asset, amount, value) {
 		super(timestamp);
 		this.value = value;
-		// this constructor can be 
+		// if an asset is given, there must also be an amount
 		if (typeof asset == "string") {
 			this.asset = asset;
 			this.amount = amount;
 			if (!(this.amount > 0)) throw new Error("Fee report entry using an asset must have an amount greater than zero");
+		} else {
+			// if no asset / amount is given, we definitely need a value in fiat currency
+			if (!(this.value > 0)) throw new Error("Fee report entry misses fiat value");
 		}
-		if (!(this.value > 0)) throw new Error("Fee report entry has invalid value");
 	}
 	
 	/**
@@ -28,14 +35,14 @@ export class Fee extends ReportEntry {
 	 */
 	async process() {
 		if (typeof this.value != "number") {
-			if (!this.asset || !this.amount) throw new Error("If fee report entry has no value it must have asset and amount");
 			this.value = await ExchangeRates.getValue(this.timestamp, this.asset, this.amount);
 		}
+		return this;
 	}
 	
 	async toString() {
 		return [
-			this.timestamp.toLocaleString(),
+			this.timestamp.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
 			((this.amount > 0) ? this.amount : ""),
 			(this.asset ? this.asset : ""),
 			this.value

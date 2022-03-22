@@ -4,7 +4,7 @@ export class ReportEntry {
 	}
 	
 	compare(anotherReportEntry) {
-		return a.timestamp - anotherReportEntry.timestamp;
+		return this.timestamp - anotherReportEntry.timestamp;
 	}
 	
 	getTaxYear() {

@@ -18,7 +18,7 @@ export class ReportGenerator {
 		
 		// a separate report for every year
 		const endYear = new Date().getFullYear();
-		for (let year = 2009; year < endYear; year++) { // in 2008 there were no cryptos, so start in 2009
+		for (let year = 2009; year <= endYear; year++) { // in 2008 there were no cryptos, so start in 2009
 			// gather all report entries for this tax year
 			const reportEntries = this.entries.filter(line => line.getTaxYear() == year);
 			

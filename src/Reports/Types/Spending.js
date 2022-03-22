@@ -1,6 +1,11 @@
 import { ReportEntry } from "../ReportEntry.js";
+import { DateTime } from "luxon";
 
 export class Spending extends ReportEntry {
+	static get filename() {
+		return "Spendings.csv";
+	}
+	
 	static getHeadline() {
 		return "Time;Amount;Asset;Value in " + Config.BaseCurrency;
 	}
@@ -18,13 +23,14 @@ export class Spending extends ReportEntry {
 	 */
 	async process() {
 		if (typeof this.value != "number") {
-			tihs.value = await CoinPrices.getBaseCurrencyValue(this.timestamp, this.asset, this.amount);
+			this.value = await await ExchangeRates.getValue(this.timestamp, this.asset, this.amount);
 		}
+		return this;
 	}
 	
 	toString() {
 		return [
-			this.timestamp.toLocaleString(),
+			this.timestamp.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
 			this.amount,
 			this.asset,
 			this.value

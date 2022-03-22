@@ -5,6 +5,10 @@ import { Tranche } from "../../Tranche.js";
 import { Duration } from "luxon";
 
 export class Gain extends ReportEntry {
+	static get filename() {
+		return "Gains.csv";
+	}
+	
 	static getHeadline() {
 		return "Sell Time;Buy Time;Amount;Asset;Sell Rate;Buy Rate;Gain in " + globalThis.Config.BaseCurrency + ";";
 	}
@@ -55,9 +59,10 @@ export class Gain extends ReportEntry {
 		}
 
 		// check if coinAge is below the threshold (otherwise not tax relevant)
+		// TODO: check if these config options really exist
 		let taxRelevant = (this.soldTranche.sourceTransaction instanceof Buy) && (
-			(this.soldTranche.flags.has(Tranche.Flags.Staked) && (coinAge < Duration.fromObject(globalThis.Config.TimeUntilTaxFree.IfStaked))) ||
-			(coinAge < Duration.fromObject(globalThis.Config.TimeUntilTaxFree.IfOnlyHeld))
+			(this.soldTranche.flags.has(Tranche.Flags.Staked) && (coinAge < Duration.fromObject(globalThis.Config.TaxRules.Trading.NoxTaxIfStakedAfter))) ||
+			(coinAge < Duration.fromObject(globalThis.Config.TaxRules.Trading.NoTaxIfHeldAfter))
 		);
 		
 		// returning null if not tax relevant ensures that this report entry doesn't show up in the report
