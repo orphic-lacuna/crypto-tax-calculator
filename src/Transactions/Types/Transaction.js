@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 /**
  * Base class for all transactions. Each transaction has a timestamp and depot to which it belongs.
  */
@@ -7,7 +9,7 @@ export class Transaction {
 	
 	constructor(depot, timestamp, asset, amount) {
 		if (!depot) throw new Error("cannot create transaction without depot");
-		if (typeof timestamp != "number") throw new Error("cannot create transaction without timestamp");
+		if (!(timestamp instanceof DateTime)) throw new Error("cannot create transaction without timestamp");
 		this.depot = depot;
 		this.timestamp = timestamp;
 		this.asset = asset;

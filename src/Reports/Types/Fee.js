@@ -12,32 +12,30 @@ export class Fee extends ReportEntry {
 	 */
 	constructor(timestamp, asset, amount, value) {
 		super(timestamp);
+		this.value = value;
 		// this constructor can be 
 		if (typeof asset == "string") {
 			this.asset = asset;
 			this.amount = amount;
 			if (!(this.amount > 0)) throw new Error("Fee report entry using an asset must have an amount greater than zero");
-			this.value = value;
-		} else if (typeof asset == "number") {
-			this.value = asset;
-		} else {
-			throw new Error("Invalid parameters for fee report entry constructor");
 		}
 		if (!(this.value > 0)) throw new Error("Fee report entry has invalid value");
 	}
 	
 	/**
-	 * Processes the report entry. If the value of the received interest in not yet known, resolve the value looking up the asset exchange rate at timestamp. 
+	 * Processes the report entry. If the value of the paid fee is not yet known and the fee was paid not in fiat currency,
+	 * then the value is calculated using the exchange rate of the asset at this time. 
 	 */
 	async process() {
 		if (typeof this.value != "number") {
-			tihs.value = await CoinPrices.getBaseCurrencyValue(this.timestamp, this.asset, this.amount);
+			if (!this.asset || !this.amount) throw new Error("If fee report entry has no value it must have asset and amount");
+			this.value = await ExchangeRates.getValue(this.timestamp, this.asset, this.amount);
 		}
 	}
 	
 	async toString() {
 		return [
-			new Date(this.timestamp).toLocaleString(),
+			this.timestamp.toLocaleString(),
 			((this.amount > 0) ? this.amount : ""),
 			(this.asset ? this.asset : ""),
 			this.value

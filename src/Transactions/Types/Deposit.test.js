@@ -6,6 +6,7 @@ import { Deposit } from "./Deposit.js";
 import { Withdrawal } from "./Withdrawal.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
+import { DateTime } from "luxon";
 
 chai.use(sinonChai);
 
@@ -28,7 +29,7 @@ describe('Transactions', function() {
 		
 			depot = new Depot("Main Depot");
 			otherDepot = new Depot("Other Depot");
-			now = new Date().getTime() / 1000;
+			now = DateTime.now();
 			processor = new TransactionProcessor();
 		});
 		

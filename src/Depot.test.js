@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { Depot } from "./Depot.js";
+import { DateTime, Duration } from "luxon";
 
 describe('Depot', function() {
 	let depot;
@@ -7,7 +8,7 @@ describe('Depot', function() {
 	
 	beforeEach(function() {
 		depot = new Depot("Main Depot");
-		now = new Date().getTime() / 1000;
+		now = DateTime.now();
 	});
 
 	it('must calculate the balance as the sum of unconsumed coins of all tranches', function() {
@@ -18,7 +19,7 @@ describe('Depot', function() {
 			sum += amount;
 		}
 		// extra check: a tranche lying in the future may not be included in the sum
-		depot.addTranche(now + 300, "BTC", 1);
+		depot.addTranche(now.plus(Duration.fromObject({seconds: 300})), "BTC", 1);
 		expect(depot.getBalance(now, "BTC")).to.equal(sum);
 	});
 	
@@ -45,21 +46,21 @@ describe('Depot', function() {
 			// add "new" tranche
 			const youngTranche = depot.addTranche(now, "BTC", 2);
 			// add a tranche that is 1h old
-			const oldTranche = depot.addTranche(now - 3600, "BTC", 1);
+			const oldTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 3600})), "BTC", 1);
 			// add a tranche that is 30min old
-			const middleTranche = depot.addTranche(now - 1800, "BTC", 0.5);
+			const middleTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 1800})), "BTC", 0.5);
 			
 			expect(depot._getNextTranche("BTC", now)).to.equal(oldTranche);
 		});
 		
 		it('if tranches are partially consumed', function() {
 			// add a tranche that is 30min old
-			const middleTranche = depot.addTranche(now - 1800, "BTC", 0.5);
+			const middleTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 1800})), "BTC", 0.5);
 			middleTranche.consume(0.25);
 			// add "new" tranche
 			const youngTranche = depot.addTranche(now, "BTC", 2);
 			// add a tranche that is 1h old
-			const oldTranche = depot.addTranche(now - 3600, "BTC", 1);
+			const oldTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 3600})), "BTC", 1);
 			oldTranche.consume(1);
 			
 			expect(depot._getNextTranche("BTC", now)).to.equal(middleTranche);
@@ -67,12 +68,12 @@ describe('Depot', function() {
 		
 		it('if there are only unconsumed tranches with a creation timestamp lying in the future', function() {
 			// add a tranche that is 10min old
-			const middleTranch = depot.addTranche(now - 600, "BTC", 1);
+			const middleTranch = depot.addTranche(now.minus(Duration.fromObject({seconds: 600})), "BTC", 1);
 			middleTranch.consume(1);
 			// add a tranche that will be created in 30min
-			const futureTranche = depot.addTranche(now + 1800, "BTC", 0.5);
+			const futureTranche = depot.addTranche(now.plus(Duration.fromObject({seconds: 600})), "BTC", 0.5);
 			// add 1h old tranche
-			const oldTranche = depot.addTranche(now - 3600, "BTC", 1);
+			const oldTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 3600})), "BTC", 1);
 			oldTranche.consume(1);
 			
 			expect(depot._getNextTranche("BTC", now)).to.be.undefined;
@@ -82,11 +83,11 @@ describe('Depot', function() {
 	describe('can consume their tranches', function() {
 		it('but only those not lying in the future', function() {
 			// add a tranche that is 10min old
-			const middleTranch = depot.addTranche(now - 600, "BTC", 2);
+			const middleTranch = depot.addTranche(now.minus(Duration.fromObject({seconds: 600})), "BTC", 2);
 			// add a tranche that will be created in 30min
-			const futureTranche = depot.addTranche(now + 1800, "BTC", 3);
+			const futureTranche = depot.addTranche(now.plus(Duration.fromObject({seconds: 600})), "BTC", 3);
 			// add 1h old tranche
-			const oldTranche = depot.addTranche(now - 3600, "BTC", 1);
+			const oldTranche = depot.addTranche(now.minus(Duration.fromObject({seconds: 3600})), "BTC", 1);
 
 			// now are 3 BTC available, and in 30 min 6 BTC will be available
 			// consume function will not fail, because it creates missing tranches

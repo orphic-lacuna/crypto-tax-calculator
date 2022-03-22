@@ -14,17 +14,17 @@ export class Interest extends ReportEntry {
 	}
 	
 	/**
-	 * Processes the report entry. If the value of the received interest in not yet known, resolve the value looking up the asset exchange rate at timestamp. 
+	 * Processes the report entry. If the value of the received interest is not yet known, resolve the value looking up the asset exchange rate at timestamp. 
 	 */
 	async process() {
 		if (typeof this.value != "number") {
-			tihs.value = await CoinPrices.getBaseCurrencyValue(this.timestamp, this.asset, this.amount);
+			tihs.value = await ExchangeRates.getValue(this.timestamp, this.asset, this.amount);
 		}
 	}
 	
 	async toString() {
 		return [
-			new Date(this.timestamp).toLocaleString(),
+			this.timestamp.toLocaleString(),
 			this.amount,
 			this.asset,
 			this.value,

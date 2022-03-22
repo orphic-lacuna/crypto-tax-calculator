@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { Interest } from "./Interest.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
+import { DateTime } from "luxon";
 
 describe('Transactions', function() {
 	describe('Interest transaction', function() {
@@ -12,7 +13,7 @@ describe('Transactions', function() {
 		
 		beforeEach(function() {
 			depot = new Depot("Main Depot");
-			now = new Date().getTime() / 1000;
+			now = DateTime.now();
 			processor = new TransactionProcessor();
 		});
 		

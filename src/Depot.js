@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Tranche } from "./Tranche.js";
 
 /**
@@ -53,7 +54,7 @@ export class Depot {
 	 * @param fifo		If true, the oldest tranche is returned. If false, the newest tranche is returned.
 	 */
 	_getNextTranche(asset, timestamp, fifo=true) {
-		if (typeof timestamp != "number") throw new Error("missing timestamp");
+		if (!(timestamp instanceof DateTime)) throw new Error("missing timestamp");
 		
 		// filter out all tranches
 		// 		a) that do not have the desired asset
@@ -126,7 +127,7 @@ export class Depot {
 	 * Returns the balance of the depot for a given asset and timestamp.
 	 */	
 	getBalance(timestamp, asset) {
-		if (typeof timestamp != "number") throw new Error("missing timestamp");
+		if (!(timestamp instanceof DateTime)) throw new Error("missing timestamp");
 		return [...this.tranches.values()].filter(t => (t.asset == asset) && (t.creationTimestamp <= timestamp)).reduce((balance, t) => balance + t.amountLeft, 0);
 	}
 }

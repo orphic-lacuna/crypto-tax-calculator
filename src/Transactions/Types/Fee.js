@@ -12,7 +12,7 @@ export class Fee extends Transaction {
 	_process(reports) {
 		// if a fee transaction has no amount, the fee is paid only in base currency and doesn't consume any coin tranches
 		if (!this.asset || (typeof this.amount != "number") || (this.amount == 0)) {
-			reports.Fee.add(this.timestamp, this.value);
+			reports.Fee.add(this.timestamp, undefined, undefined, this.value);
 		} else {
 			// otherwise the fee is paid using asset, so we must consume coins for that purpose
 			this.depot.consume(this.timestamp, this.asset, this.amount);

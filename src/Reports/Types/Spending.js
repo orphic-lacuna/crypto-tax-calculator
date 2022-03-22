@@ -13,7 +13,8 @@ export class Spending extends ReportEntry {
 	}
 
 	/**
-	 * Processes the report entry. If the value of the received interest in not yet known, resolve the value looking up the asset exchange rate at timestamp. 
+	 * Processes the report entry. If the value of the spent coins is not yet known the
+	 * value is calculated using the exchange rate of the asset at this time. 
 	 */
 	async process() {
 		if (typeof this.value != "number") {
@@ -23,7 +24,7 @@ export class Spending extends ReportEntry {
 	
 	toString() {
 		return [
-			new Date(this.timestamp).toLocaleString(),
+			this.timestamp.toLocaleString(),
 			this.amount,
 			this.asset,
 			this.value

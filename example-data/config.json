@@ -4,7 +4,8 @@
 		"MaxTimeDeviationSec": 10800
 	},
 	"TimeUntilTaxFree": {
-		"IfOnlyHeld": 31536000,
-		"IfStaked": 315360000
-	}
+		"IfOnlyHeld": { "years": 1 },
+		"IfStaked": { "years": 10 }
+	},
+	"BaseCurrency": "EURO"
 }
