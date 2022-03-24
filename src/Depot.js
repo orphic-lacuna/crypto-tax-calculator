@@ -24,7 +24,7 @@ export class Depot {
 	getSubDepot(name, autoCreate=true) {
 		let subDepot = [...this.subDepots.values()].find(depot => depot.name == name);
 		if (!subDepot) {
-			return new Depot(this, name);
+			return new Depot(name, this);
 		}
 		return subDepot;
 	}

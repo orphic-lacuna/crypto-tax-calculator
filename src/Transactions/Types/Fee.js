@@ -8,7 +8,6 @@ export class Fee extends Transaction {
 	
 	constructor(depot, timestamp, asset, amount, value, parentTransaction) {
 		super(depot, timestamp, asset, amount);
-		if ((typeof value != "number") || (value < 0)) throw new Error("Invalid value for fee transaction");
 		this.value = value;
 		this.parentTransaction = parentTransaction;
 	}
