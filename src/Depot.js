@@ -89,7 +89,7 @@ export class Depot {
 		
 		let amountLeftToBeConsumed = amount;
 		// loop until all requested coins are provided by tranches of this depot
-		while (amountLeftToBeConsumed > 0) {
+		while (amountLeftToBeConsumed > globalThis.Config.DustLimit) {
 			// get the next tranche that should be consumed
 			let trancheToBeConsumedNext = this._getNextTranche(asset, timestamp);
 			// if there is no tranche that can be consumed
@@ -103,7 +103,7 @@ export class Depot {
 					amount: amountLeft
 				});*/
 				// now create a fake tranche with creation timestamp equal to consumption timestamp to be tax correct (in doubt for the govt.)
-				trancheToBeConsumedNext = new Tranche(this.depot, timestamp, asset, amountLeftToBeConsumed);
+				trancheToBeConsumedNext = new Tranche(this, timestamp, asset, amountLeftToBeConsumed);
 			}
 			// determine how much of the requested amount can be covered by this tranche
 			const amountConsumedByCurrentTranche = trancheToBeConsumedNext.consume(amountLeftToBeConsumed);

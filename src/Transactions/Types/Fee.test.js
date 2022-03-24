@@ -4,6 +4,7 @@ import { Fee } from "./Fee.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
 import { DateTime } from "luxon";
+import { ConfigLoader } from "../../ConfigLoader.js";
 
 describe('Transactions', function() {
 	describe('Fee transaction', function() {
@@ -16,6 +17,9 @@ describe('Transactions', function() {
 		const allowedDelta = 0.00000000001;
 		
 		beforeEach(function() {
+			// load the config
+			globalThis.Config = new ConfigLoader();
+
 			depot = new Depot("Main Depot");
 			now = DateTime.now();
 			processor = new TransactionProcessor();

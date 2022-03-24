@@ -10,11 +10,11 @@ export class Interest extends ReportEntry {
 		return "Time;Amount;Asset;Value in " + Config.BaseCurrency + ";Type;";
 	}
 	
-	constructor(timestamp, asset, amount, type, value) {
+	constructor(timestamp, asset, amount, source, value) {
 		super(timestamp);
 		this.asset = asset;
 		this.amount = amount;
-		this.type = type;
+		this.source = source;
 		this.value = value;
 	}
 	
@@ -23,7 +23,7 @@ export class Interest extends ReportEntry {
 	 */
 	async process() {
 		// check if this type of interest is tax relevant, if not do not include it in the final report
-		if (!globalThis.Config.TaxRules.Interest.TaxedTypes.includes(this.type.description)) return null;
+		if (!globalThis.Config.TaxRules.Interest.TaxedTypes.includes(this.source.description)) return null;
 
 		if (typeof this.value != "number") {
 			this.value = await ExchangeRates.getValue(this.timestamp, this.asset, this.amount);
@@ -38,7 +38,7 @@ export class Interest extends ReportEntry {
 			this.amount,
 			this.asset,
 			this.value,
-			this.type.description
+			this.source.description
 		].join(";");
 	}
 }

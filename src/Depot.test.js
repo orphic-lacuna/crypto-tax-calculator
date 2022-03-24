@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { Depot } from "./Depot.js";
 import { DateTime, Duration } from "luxon";
+import { ConfigLoader } from "./ConfigLoader.js";
 
 describe('Depot', function() {
 	let depot;
@@ -9,6 +10,8 @@ describe('Depot', function() {
 	beforeEach(function() {
 		depot = new Depot("Main Depot");
 		now = DateTime.now();
+		// load the config
+		globalThis.Config = new ConfigLoader();
 	});
 
 	it('must calculate the balance as the sum of unconsumed coins of all tranches', function() {

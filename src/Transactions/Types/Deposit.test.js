@@ -7,6 +7,7 @@ import { Withdrawal } from "./Withdrawal.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
 import { DateTime } from "luxon";
+import { ConfigLoader } from "../../ConfigLoader.js";
 
 chai.use(sinonChai);
 
@@ -20,12 +21,8 @@ describe('Transactions', function() {
 		let tranches;
 		
 		beforeEach(function() {
-			globalThis.Config = {
-				"DepositWithdrawalLinking": {
-					"MaxAmountDeviationRatio": 0.05,
-					"MaxTimeDeviationSec": 10800
-				}
-			};
+			// load the config
+			globalThis.Config = new ConfigLoader();
 		
 			depot = new Depot("Main Depot");
 			otherDepot = new Depot("Other Depot");

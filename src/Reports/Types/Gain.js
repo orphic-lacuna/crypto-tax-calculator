@@ -1,8 +1,6 @@
 import { ReportEntry } from "../ReportEntry.js";
-import { Buy } from "../../Transactions/Types/Buy.js";
-import { Interest } from "../../Transactions/Types/Interest.js";
 import { Tranche } from "../../Tranche.js";
-import { Duration } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 export class Gain extends ReportEntry {
 	static get filename() {
@@ -39,31 +37,42 @@ export class Gain extends ReportEntry {
 		}
 		
 		// determine the coin age
-		coinAge = this.timestamp.diff(this.soldTranche.timestamp);
+		coinAge = this.timestamp.diff(this.soldTranche.creationTimestamp);
 		
-		// check the type of the source transaction of the sold tranche
-		if (this.soldTranche.sourceTransaction instanceof Buy) {
-			// check if the value of the buy transaction is already known
-			if (typeof this.soldTranche.sourceTransaction.value == "number") {
-				valueAtBuyTime = this.soldTranche.sourceTransaction.value;
-				this.buyRate = valueAtBuyTime / this.soldTranche.sourceTransaction.amount;
-			} else {
-				this.buyRate = await ExchangeRates.getExchangeRate(this.soldTranche.sourceTransaction.timestamp, this.soldTranche.sourceTransaction.asset);
-				valueAtBuyTime = this.buyRate * this.soldTranche.sourceTransaction.amount;
+		let taxRelevant = false;
+		
+		// check if we have a source transaction
+		if (this.soldTranche.sourceTransaction) {
+			// check the type of the source transaction of the sold tranche
+			// Is the source transaction to be taxed when selling?
+			if (globalThis.Config.TaxRules.Trading.TaxedWhenSelling.includes(this.soldTranche.sourceTransaction.type)) {
+				// it is tax relevant
+				
+				// check if the value of the buy transaction is already known
+				if (typeof this.soldTranche.sourceTransaction.value == "number") {
+					this.buyRate = this.soldTranche.sourceTransaction.value / this.soldTranche.sourceTransaction.amount;
+				} else {
+					this.buyRate = await ExchangeRates.getExchangeRate(this.soldTranche.sourceTransaction.timestamp, this.soldTranche.sourceTransaction.asset);
+				}
+				valueAtBuyTime = this.buyRate * this.amount;
+				this.gain = this.soldValue - valueAtBuyTime;
+				taxRelevant = true;
 			}
-			this.gain = this.soldValue - valueAtBuyTime;
-		} else if (this.soldTranche.sourceTransaction instanceof Interest) {
-			// if the source transaction is Interest, this sell is not tax relevant
 		} else {
 			// if we have no source transaction, assume WHAT?
 		}
-
+		
 		// check if coinAge is below the threshold (otherwise not tax relevant)
-		// TODO: check if these config options really exist
-		let taxRelevant = (this.soldTranche.sourceTransaction instanceof Buy) && (
-			(this.soldTranche.flags.has(Tranche.Flags.Staked) && (coinAge < Duration.fromObject(globalThis.Config.TaxRules.Trading.NoxTaxIfStakedAfter))) ||
-			(coinAge < Duration.fromObject(globalThis.Config.TaxRules.Trading.NoTaxIfHeldAfter))
-		);
+		if (taxRelevant) {
+			
+			if (globalThis.Config.TaxRules && globalThis.Config.TaxRules.Trading) {
+				if (globalThis.Config.TaxRules.Trading.NoTaxIfStakedLongerThan && this.soldTranche.flags.has(Tranche.Flags.Staked) && (coinAge > globalThis.Config.TaxRules.Trading.NoTaxIfStakedLongerThan)) {
+					taxRelevant = false;
+				} else if (globalThis.Config.TaxRules.Trading.NoTaxIfHeldLongerThan && (coinAge > globalThis.Config.TaxRules.Trading.NoTaxIfHeldLongerThan)) {
+					taxRelevant = false;
+				}
+			}
+		}
 		
 		// returning null if not tax relevant ensures that this report entry doesn't show up in the report
 		return taxRelevant ? this : null;
@@ -71,13 +80,13 @@ export class Gain extends ReportEntry {
 	
 	async toString() {
 		return [
-			this.timestamp.toLocaleString(),				// Sell time
-			this.soldTranche.timestamp.toLocaleString(),	// Buy time
-			((this.amount > 0) ? this.amount : ""),			// Amount
-			this.soldTranche.asset,							// Asset
-			(this.sellRate ? this.sellRate : ""),			// Sell rate
-			(this.buyRate ? this.buyRate : ""),				// Buy rate
-			this.gain										// Gain
+			this.timestamp.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),						// Sell time
+			((this.amount > 0) ? this.amount : ""),														// Amount
+			this.soldTranche.asset,																		// Asset
+			(this.sellRate ? this.sellRate : ""),														// Sell rate
+			this.soldTranche.creationTimestamp.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),	// Buy time
+			(this.buyRate ? this.buyRate : ""),															// Buy rate
+			this.gain																					// Gain
 		].join(";");
 	}
 }

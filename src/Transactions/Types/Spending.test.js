@@ -3,6 +3,7 @@ import { Spending } from "./Spending.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
 import { DateTime, Duration } from "luxon";
+import { ConfigLoader } from "../../ConfigLoader.js";
 
 describe('Transactions', function() {
 	describe('Spending transaction', function() {
@@ -14,6 +15,9 @@ describe('Transactions', function() {
 		let reports;
 		
 		beforeEach(function() {
+			// load the config
+			globalThis.Config = new ConfigLoader();
+
 			depot = new Depot("Main Depot");
 			now = DateTime.now();
 			processor = new TransactionProcessor();

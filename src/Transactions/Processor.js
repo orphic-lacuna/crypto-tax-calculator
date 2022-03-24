@@ -1,6 +1,7 @@
 import { Reports } from "../Reports/Reports.js";
 import { Withdrawal } from "./Types/Withdrawal.js";
 import { Deposit } from "./Types/Deposit.js";
+import { Duration } from "luxon";
 
 /**
  * The transaction processor is the core class that manages processing of all transactions. It keeps track
@@ -32,7 +33,7 @@ export class TransactionProcessor {
 	_linkTransactions() {
 		const withdrawals = this.transactions.filter(t => t instanceof Withdrawal);
 		const deposits = this.transactions.filter(t => t instanceof Deposit);
-		
+
 		for (let deposit of deposits ) {
 			
 			// find a matching withdrawal
@@ -46,9 +47,9 @@ export class TransactionProcessor {
 						const timeDifference = Math.abs(withdrawal.timestamp - deposit.timestamp);
 						// usually the withdrawal should have the same or greater amount than the deposit (due to fee)
 						// and should not differ more than the specified threshold
-						if ((amountDifference >= 0) && (amountDifference / withdrawal.amount < Config.DepositWithdrawalLinking.MaxAmountDeviationRatio)) {
+						if ((amountDifference >= 0) && (amountDifference / withdrawal.amount < globalThis.Config.DepositWithdrawalLinking.MaxAmountDeviationRatio)) {
 							// timestamp may not deviate more than specified time
-							if (timeDifference < Config.DepositWithdrawalLinking.MaxTimeDeviationSec) {
+							if (timeDifference < globalThis.Config.DepositWithdrawalLinking.MaxTimeDeviation) {
 								// this is a match
 								return true;
 							}

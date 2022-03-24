@@ -38,7 +38,11 @@ export class Transaction {
 	}
 	
 	toString() {
-		return "transaction on depot " + depot.getFullname() + ": " + this.amount.toString() + " " + this.asset + " at " + new Date(this.timestamp*1000).toLocaleString();
+		return this.constructor.type + " transaction on depot " + depot.getFullname() + ": " + this.amount.toString() + " " + this.asset + " at " + new Date(this.timestamp*1000).toLocaleString();
+	}
+	
+	get type() {
+		return this.constructor.type;
 	}
 }
 

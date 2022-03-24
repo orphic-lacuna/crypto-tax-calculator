@@ -1,6 +1,10 @@
 import { Transaction } from "./Transaction.js";
 
 export class Buy extends Transaction {
+	
+	static get type() {
+		return "Buy";
+	}
 
 	/**
 	 * @param	depot		Depot into which the bought coins are placed.
@@ -19,8 +23,4 @@ export class Buy extends Transaction {
 		// a buy transaction only produces coins, it doesn't consume any coins
 		this.depot.addTranche(this.timestamp, this.asset, this.amount, this);
 	}
-	
-	toString() {
-		return "Buy " + super.toString();
-	}	
 }

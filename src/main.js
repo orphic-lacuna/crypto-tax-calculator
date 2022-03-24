@@ -4,6 +4,7 @@ import * as path from "path";
 import fs from "fs";
 import { TransactionProcessor } from "./Transactions/Processor.js";
 import { ExchangeRates } from "DataProvisioning/ExchangeRates/ExchangeRates.js";
+import { ConfigLoader } from "./ConfigLoader.js";
 
 async function runTaxCalculator(argv) {
 	const dataDir = path.normalize(path.join(process.cwd(), argv.dataFolder));
@@ -16,28 +17,23 @@ async function runTaxCalculator(argv) {
 	console.log("Running tax calculator using tax data from", dataDir);
 	
 	// load the config.json
-	const configFilename = path.join(dataDir, "config.json");
-	if (fs.existsSync(configFilename)) {
-		globalThis.Config = JSON.parse(fs.readFileSync(configFilename, "utf-8"));
-	}
-	if (typeof globalThis.Config != "object") globalThis.Config = {};
-	globalThis.Config.DataDir = dataDir;
+	globalThis.Config = new ConfigLoader(path.join(dataDir, "config.json"));
 
 	// create the cache folder
-	globalThis.Config.CacheFolder = path.join(globalThis.Config.DataDir, ".cache");
-	if (!fs.existsSync(globalThis.Config.CacheFolder)) {
-		fs.mkdirSync(globalThis.Config.CacheFolder);
+	const cacheFolder = path.join(dataDir, ".cache");
+	if (!fs.existsSync(cacheFolder)) {
+		fs.mkdirSync(cacheFolder);
 	}
 
 	// create the exchange rates object
-	globalThis.ExchangeRates = new ExchangeRates();
+	globalThis.ExchangeRates = new ExchangeRates(cacheFolder);
 
 	// create the transaction processor	
 	const tp = new TransactionProcessor();
 	// processing all the transactions returns the report objects
 	const reports = tp.process();
 	// creating the reports must be done asynchronously because exchange rates must be looked up online
-	await reports.generate(path.join(Config.DataDir, "reports"));
+	await reports.generate(path.join(dataDir, "reports"));
 }
 
 yargs(hideBin(process.argv))

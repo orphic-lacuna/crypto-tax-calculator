@@ -2,6 +2,10 @@ import { Transaction } from "./Transaction.js";
 
 export class Sell extends Transaction {
 	
+	static get type() {
+		return "Sell";
+	}
+	
 	/**
 	 * Creates a new sell transaction.
 	 * @param	depot		Depot of which to take the coins that have been sold.
@@ -32,9 +36,5 @@ export class Sell extends Transaction {
 			// create the report entry
 			reports.Gain.add(this.timestamp, tranche, amount, value);
 		}
-	}
-	
-	toString() {
-		return "Sell " + super.toString();
 	}
 }

@@ -2,6 +2,10 @@ import { Transaction } from "./Transaction.js";
 
 export class Deposit extends Transaction {
 	
+	static get type() {
+		return "Deposit";
+	}
+	
 	constructor(depot, timestamp, asset, amount) {
 		super(depot, timestamp, asset, amount);
 	}
@@ -42,7 +46,7 @@ export class Deposit extends Transaction {
 	}
 	
 	toString() {
-		let result = "Deposit " + super.toString();
+		let result = super.toString();
 		if (this.withdrawalTransaction) {
 			result += " belonging to transaction " + this.withdrawalTransaction.id;
 		}

@@ -3,6 +3,7 @@ import { Interest } from "./Interest.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
 import { DateTime } from "luxon";
+import { ConfigLoader } from "../../ConfigLoader.js";
 
 describe('Transactions', function() {
 	describe('Interest transaction', function() {
@@ -12,13 +13,16 @@ describe('Transactions', function() {
 		let processor; 
 		
 		beforeEach(function() {
+			// load the config
+			globalThis.Config = new ConfigLoader();
+
 			depot = new Depot("Main Depot");
 			now = DateTime.now();
 			processor = new TransactionProcessor();
 		});
 		
 		it('should create a new tranche on its depot', function() {
-			const interestTransaction = processor.addTransaction(new Interest(depot, now, "BTC", 5, Interest.Type.Mining));
+			const interestTransaction = processor.addTransaction(new Interest(depot, now, "BTC", 5, Interest.Source.Mining));
 			processor.process();
 			expect(depot.getBalance(now, "BTC")).to.equal(5);
 			const tranches = [...depot.tranches.values()];
@@ -30,13 +34,13 @@ describe('Transactions', function() {
 		});
 
 		it('should create a new interest report entry', function() {
-			const interestTransaction = processor.addTransaction(new Interest(depot, now, "BTC", 5, Interest.Type.Mining));
+			const interestTransaction = processor.addTransaction(new Interest(depot, now, "BTC", 5, Interest.Source.Mining));
 			const reports = processor.process();
 			expect(reports.Interest.size).to.equal(1);
 			const reportEntry = reports.Interest.entries[0]; 
 			expect(reportEntry.asset).to.equal("BTC");
 			expect(reportEntry.amount).to.equal(5);
-			expect(reportEntry.type).to.equal(Interest.Type.Mining);
+			expect(reportEntry.source).to.equal(Interest.Source.Mining);
 		});
 	});
 });

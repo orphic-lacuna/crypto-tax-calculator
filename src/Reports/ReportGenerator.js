@@ -14,7 +14,11 @@ export class ReportGenerator {
 		this.entries = this.entries.sort((a, b) => a.compare(b));
 		
 		// process all the entries asynchronously, filtering out all entries whose process function returns null  
-		this.entries = (await Promise.all(this.entries.map(entry => entry.process()))).filter(entry => entry !== null);
+		for (let i = 0; i < this.entries.length; i++) {
+			this.entries[i] = await this.entries[i].process();
+		}
+		// this.entries = (await Promise.all(this.entries.map(entry => entry.process()))).filter(entry => entry !== null);
+		this.entries = this.entries.filter(entry => entry !== null);
 		
 		// a separate report for every year
 		const endYear = new Date().getFullYear();

@@ -3,6 +3,7 @@ import { Withdrawal } from "./Withdrawal.js";
 import { Depot } from "../../Depot.js";
 import { TransactionProcessor } from "../Processor.js";
 import { DateTime } from "luxon";
+import { ConfigLoader } from "../../ConfigLoader.js";
 
 describe('Transactions', function() {
 	describe('Withdrawal transaction', function() {
@@ -13,6 +14,9 @@ describe('Transactions', function() {
 		let tranches;
 		
 		beforeEach(function() {
+			// load the config
+			globalThis.Config = new ConfigLoader();
+
 			depot = new Depot("Main Depot");
 			now = DateTime.now();
 			processor = new TransactionProcessor();

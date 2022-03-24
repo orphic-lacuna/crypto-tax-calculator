@@ -3,6 +3,7 @@ import { Spending } from "./Spending.js";
 import { DateTime, Duration } from "luxon";
 import { ReportGenerator } from "../ReportGenerator.js";
 import { ExchangeRates } from "../../DataProvisioning/ExchangeRates/ExchangeRates.js";
+import { ConfigLoader } from "../../ConfigLoader.js";
 import fs from "fs";
 import path from "path";
 
@@ -25,13 +26,10 @@ describe('Reports', function() {
 			if (!fs.existsSync(cacheFolder)) fs.mkdirSync(cacheFolder);
 			
 			// create global config
-			globalThis.Config = {
-				BaseCurrency: "EUR",
-				CacheFolder: cacheFolder
-			};
+			globalThis.Config = new ConfigLoader();
 			
 			// create the exchange rates object
-			globalThis.ExchangeRates = new ExchangeRates();
+			globalThis.ExchangeRates = new ExchangeRates(cacheFolder);
 		});
 		
 		after(function() {

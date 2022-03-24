@@ -2,6 +2,10 @@ import { Transaction } from "./Transaction.js";
 
 export class Fee extends Transaction {
 	
+	static get type() {
+		return "Fee";
+	}
+	
 	constructor(depot, timestamp, asset, amount, value, parentTransaction) {
 		super(depot, timestamp, asset, amount);
 		if ((typeof value != "number") || (value < 0)) throw new Error("Invalid value for fee transaction");
@@ -22,7 +26,7 @@ export class Fee extends Transaction {
 	}
 	
 	toString() {
-		let result = "Fee " + super.toString();
+		let result = super.toString();
 		if (this.parentTransaction) {
 			result += " belonging to transaction " + this.parentTransaction.id;
 		}

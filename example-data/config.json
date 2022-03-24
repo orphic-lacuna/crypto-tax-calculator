@@ -1,16 +1,18 @@
 {
 	"DepositWithdrawalLinking": {
 		"MaxAmountDeviationRatio": 0.05,
-		"MaxTimeDeviationSec": 10800
+		"MaxTimeDeviation": { "hours": 3 }
 	},
 	"TaxRules": {
 		"Trading": {
-			"NoTaxIfHeldAfter": { "years": 1 },
-			"NoxTaxIfStakedAfter": { "years": 10 }
+			"TaxedWhenSelling": ["Buy", "Deposit"],
+			"NoTaxIfHeldLongerThan": { "years": 1 },
+			"NoTaxIfStakedLongerThan": { "years": 10 }
 		},
 		"Interest": {
 			"TaxedTypes": ["Mining", "Staking", "Lending", "Referral"]
 		}
 	},
-	"BaseCurrency": "EUR"
+	"BaseCurrency": "EUR",
+	"DustLimit": 1E-12
 }

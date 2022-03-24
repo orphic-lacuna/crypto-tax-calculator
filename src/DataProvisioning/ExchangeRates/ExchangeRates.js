@@ -19,6 +19,7 @@ const cgc = new CoinGecko();
  * This list contains for each coin symbol the full coin / token name to prevent ambiguity.
  */
 const CoinNames = {
+	"ETH": "Ethereum",
 	"LTC": "Litecoin",
 	"XRP": "XRP",
 	"DOT": "Polkadot",
@@ -44,8 +45,8 @@ const CoinNames = {
  * The coin list can resolve a coin symbol into the CoinGecko coin ID.
  */
 class CoinList {
-	constructor() {
-		this.cacheFilename = path.join(globalThis.Config.CacheFolder, "coin-ids.json");
+	constructor(cacheFolder) {
+		this.cacheFilename = path.join(cacheFolder, "coin-ids.json");
 	}
 	
 	/**
@@ -109,8 +110,8 @@ class CoinList {
 		const coin = this.list.find(matchCondition);
 		if (!coin) {
 			// if no coin was found, compose a list of coins that COULD match and display them in the error message
-			similiarCoinList = this.list.filter(symbolOrNameMatching).map(coin => [coin.symbol, coin.name].join(" "));
-			throw new Error(symbol + " not found on CoinGecko, similiar coins:\n" + similiarCoinList.join("\n"));
+			let similarCoinList = this.list.filter(symbolOrNameMatching).map(coin => [coin.symbol, coin.name].join(" "));
+			throw new Error(symbol + " not found on CoinGecko, similiar coins:\n" + similarCoinList.join("\n"));
 		}
 		return coin.id;
 	}
@@ -120,9 +121,9 @@ class CoinList {
  * ExchangeRates class fetches exchange rate of any asset at any time and uses a file cache to speed up recurrent requests.
  */
 export class ExchangeRates {
-	constructor() {
-		this.cacheFilename = path.join(globalThis.Config.CacheFolder, "exchange-rates.json");
-		this.coinList = new CoinList();
+	constructor(cacheFolder) {
+		this.cacheFilename = path.join(cacheFolder, "exchange-rates.json");
+		this.coinList = new CoinList(cacheFolder);
 		
 		// check if there is a price cache file		
 		if (fs.existsSync(this.cacheFilename)) {
