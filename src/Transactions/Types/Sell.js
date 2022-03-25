@@ -16,7 +16,7 @@ export class Sell extends Transaction {
 	 */
 	constructor(depot, timestamp, asset, amount, value) {
 		super(depot, timestamp, asset, amount);
-		if ((typeof value != "number") || (value < 0)) throw new Error("Invalid value for sell transaction");
+		// if ((typeof value != "number") || (value < 0)) throw new Error("Invalid value for sell transaction");
 		this.value = value;
 	}
 	

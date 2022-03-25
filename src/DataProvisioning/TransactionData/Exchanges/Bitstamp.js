@@ -69,7 +69,7 @@ export class BitstampParser {
 		
 		for (let line of data) {
 			// get the main transaction
-			let transaction;
+			let transaction = false;
 			switch(line.type) {
 				case "Deposit":
 					if (!isFiatCurrency(line.cryptoValue.asset)) transaction = new Deposit(this.depot.getSubDepot(line.wallet), line.timestamp, line.cryptoValue.asset, line.cryptoValue.amount);
@@ -86,9 +86,6 @@ export class BitstampParser {
 					break;
 				case "Crypto currency purchase":
 					// this type is simply an EURO deposit, this does not interest us (except for the fees)
-					break;
-				default:
-					transaction = false; 
 					break;
 			}
 			
