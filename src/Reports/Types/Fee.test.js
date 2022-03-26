@@ -62,6 +62,8 @@ describe('Reports', function() {
 			});
 
 			it('should lookup the exchange rate if value of fee is not yet known', async function() {
+				this.timeout(5000);
+				
 				const reportEntryTimestamp = DateTime.fromObject({year: 2022, month: 2, day: 20});
 				reportGenerator.add(reportEntryTimestamp, "BTC", 0.001);
 				await reportGenerator.generate(reportFolder);

@@ -1,0 +1,4 @@
+Type,Datetime,Account,Amount,Value,Rate,Fee,Sub Type
+Deposit,"Feb. 24, 2022, 11:30 AM",Main Account,50.00 EUR,,,,
+Market,"Feb. 24, 2022, 01:30 PM",Main Account,0.01404788 BTC,49.87 EUR,3550.00 EUR,0.13000 EUR,Buy
+Withdrawal,"Feb. 24, 2022, 02:30 PM",Main Account,0.01404788 BTC,,,0.00000000 BTC,

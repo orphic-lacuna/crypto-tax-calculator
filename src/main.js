@@ -5,6 +5,7 @@ import fs from "fs";
 import { TransactionProcessor } from "./Transactions/Processor.js";
 import { ExchangeRates } from "DataProvisioning/ExchangeRates/ExchangeRates.js";
 import { ConfigLoader } from "./ConfigLoader.js";
+import { DataLoader } from "./DataProvisioning/DataLoader.js";
 
 async function runTaxCalculator(argv) {
 	const dataDir = path.normalize(path.join(process.cwd(), argv.dataFolder));
@@ -30,6 +31,10 @@ async function runTaxCalculator(argv) {
 
 	// create the transaction processor	
 	const tp = new TransactionProcessor();
+	// load all transactions
+	const dl = new DataLoader(tp);
+	dl.load(dataDir); 
+	
 	// processing all the transactions returns the report objects
 	const reports = tp.process();
 	// creating the reports must be done asynchronously because exchange rates must be looked up online
