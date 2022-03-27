@@ -16,6 +16,7 @@
 	"license": "GPL-3.0",
 	"dependencies": {
 		"@types/yargs": "^17.0.8",
+		"axios": "^0.26.1",
 		"coingecko-api": "^1.0.10",
 		"ethers": "^5.5.4",
 		"luxon": "^2.3.1",

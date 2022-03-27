@@ -1,14 +1,7 @@
 import CoinGecko from 'coingecko-api';
 import fs from "fs";
 import * as path from "path";
-
-/**
- * Sleep function is a helper to slow down the requests to CoinGecko to prevent running into a rate limit
- * causing the requests to fail.
- */
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import { sleep } from "../../lib.js";
 
 /**
  * Create a CoinGecko object.

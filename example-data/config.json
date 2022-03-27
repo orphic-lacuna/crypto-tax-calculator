@@ -14,5 +14,9 @@
 		}
 	},
 	"BaseCurrency": "EUR",
-	"DustLimit": 1E-12
+	"DustLimit": 1E-12,
+	"APIKeys": {
+		"Etherscan": "<Your Etherscan API key>",
+		"NOWNodes": "<Your NOWNodes API key>"
+	}
 }
