@@ -66,26 +66,53 @@ describe('Blockchain Explorers', function() {
 			expect(transactions.tokens[0].contractAddress).to.be.equal("0x4e0603e2a27a30480e5e3a4fe548e29ef12f64be");
 		});
 		
-		it('generates buy transactions for positive amounts', async function() {
+		it('processes the fetched transactions correctly', async function() {
+			// process the normal transactions
 			explorer._processTransactions(transactions.normal.slice(0,2), address);
-			
+
 			expect(processor.transactions.length).to.be.equal(3);
-			
+
+			// Genesis deposit			
 			expect(processor.transactions[0]).to.be.instanceof(Deposit);
 			expect(processor.transactions[0].asset).to.be.equal("ETH");
 			expect(processor.transactions[0].amount).to.be.equal(10000);
 			expect(+processor.transactions[0].timestamp).to.be.equal(+DateTime.fromMillis(1438269973000));
-			// there is no fee for the genesis block
+			// there is no fee for deposits / especially the genesis block has not consumed any gas
 			
+			// first withdrawal
 			expect(processor.transactions[1]).to.be.instanceof(Withdrawal);
 			expect(processor.transactions[1].asset).to.be.equal("ETH");
 			expect(processor.transactions[1].amount).to.be.equal(5);
 			expect(+processor.transactions[1].timestamp).to.be.equal(+DateTime.fromMillis(1438947953000));
 			
+			// fee for first withdrawal
 			expect(processor.transactions[2]).to.be.instanceof(Fee);
 			expect(processor.transactions[2].asset).to.be.equal("ETH");
 			expect(processor.transactions[2].amount).to.be.equal(0.0086448);
 			expect(+processor.transactions[2].timestamp).to.be.equal(+DateTime.fromMillis(1438947953000));
+			
+			// clear the transactions and now process the internal transactions
+			processor.transactions.length = 0;
+			explorer._processTransactions(transactions.internal.slice(0,1), address);
+
+			expect(processor.transactions.length).to.be.equal(1);
+
+			expect(processor.transactions[0]).to.be.instanceof(Deposit);
+			expect(processor.transactions[0].asset).to.be.equal("ETH");
+			expect(processor.transactions[0].amount).to.be.equal(7);
+			expect(+processor.transactions[0].timestamp).to.be.equal(+DateTime.fromMillis(1469590563000));
+
+
+			// clear the transactions and now process the ERC-20 transactions
+			processor.transactions.length = 0;
+			explorer._processTransactions(transactions.tokens.slice(0,1), address);
+
+			expect(processor.transactions.length).to.be.equal(1);
+
+			expect(processor.transactions[0]).to.be.instanceof(Deposit);
+			expect(processor.transactions[0].asset).to.be.equal("CREDO");
+			expect(processor.transactions[0].amount).to.be.equal(1);
+			expect(+processor.transactions[0].timestamp).to.be.equal(+DateTime.fromMillis(1504784559000));
 		});
 
 	});

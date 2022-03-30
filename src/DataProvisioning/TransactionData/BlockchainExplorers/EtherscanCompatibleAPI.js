@@ -51,7 +51,7 @@ export class EtherscanCompatibleAPI {
 		// check the HTTP response code
 		if (response.status == 200) {
 			if ((typeof response.data == "object") && (typeof response.data["message"] == "string")) {
-				if (response.data["message"].startsWith("OK")) {
+				if (response.data["message"].startsWith("OK") || (response.data["message"] == "No transactions found")) {
 					return response.data["result"];
 				} else {
 					throw new Error("Request failed: " + response.data["message"]);
@@ -101,24 +101,26 @@ export class EtherscanCompatibleAPI {
 			const value = this._adjustDecimals(transactionData["value"], transactionData["tokenDecimal"]);
 			let asset = this.baseAsset;
 			if ("tokenSymbol" in transactionData) asset = transactionData["tokenSymbol"];
-			if (value > 0) {
-				// check the from and to addresses
-				if ((transactionData["from"] == address) && (transactionData["to"] != address)) {
-					// this is a withdrawal
-					transaction = new Withdrawal(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), asset, value);
-				} else if ((transactionData["to"] == address) && (transactionData["from"] != address)) {
-					// this is a deposit
-					transaction = new Deposit(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), asset, value);
-				} else {
-					throw new Error("Transaction not processed: neither a deposit nor a withdrawal");
-				}
+			
+			// a transaction can also be a withdrawal and a deposit at the same time (if the funds were sent to the same address)
+			let withdrawalTransaction;
+			let depositTransaction;
+			
+			if (transactionData["from"] == address) {
+				withdrawalTransaction = new Withdrawal(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), asset, value);
+				if (value > 0) this.transactionProcessor.addTransaction(withdrawalTransaction);
+			}
+			if (transactionData["to"] == address) {
+				depositTransaction = new Deposit(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), asset, value);
+				if (value > 0) this.transactionProcessor.addTransaction(depositTransaction);
 			}
 			
-			if (transaction) this.transactionProcessor.addTransaction(transaction);
-			
-			// now check if we have gas consumed by this transaction which should be taken into account as a fee transaction
-			const feeAmount = this._adjustDecimals(parseInt(transactionData["gasUsed"], 10) * parseInt(transactionData["gasPrice"], 10));
-			if (feeAmount > 0) this.transactionProcessor.addTransaction(new Fee(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), this.baseAsset, feeAmount, transaction));
+			// fee is usually only interesting for withdrawals because the deposit fee is usually paid by the sender
+			if (withdrawalTransaction) {
+				// now check if we have gas consumed by this transaction which should be taken into account as a fee transaction
+				const feeAmount = this._adjustDecimals(parseInt(transactionData["gasUsed"], 10) * parseInt(transactionData["gasPrice"], 10));
+				if (feeAmount > 0) this.transactionProcessor.addTransaction(new Fee(depot, DateTime.fromMillis(transactionData["timeStamp"] * 1000), this.baseAsset, feeAmount, transaction));
+			}
 		}
 	}
 
